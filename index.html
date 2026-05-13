@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Physics Hackathon Launch</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Colonna MT, sans-serif;
+    }
+
+    body{
+      overflow:hidden;
+      background:black;
+      color:white;
+      height:100vh;
+    }
+
+    /* BACKGROUND */
+    #bg{
+      position:absolute;
+      width:100%;
+      height:100%;
+      background:
+      radial-gradient(circle at top left, rgba(0,255,255,0.2), transparent 30%),
+      radial-gradient(circle at bottom right, rgba(140,0,255,0.2), transparent 30%),
+      #020617;
+    }
+
+    canvas{
+      position:absolute;
+      width:100%;
+      height:100%;
+    }
+
+    /* MAIN SCREEN */
+    #main{
+      position:absolute;
+      inset:0;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
+      z-index:5;
+      text-align:center;
+    }
+
+    h1{
+      font-size:90px;
+      background:linear-gradient(to right, cyan, #7c3aed, white);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      margin-bottom:20px;
+      animation:glow 2s infinite alternate;
+    }
+
+    @keyframes glow{
+      from{opacity:0.7;}
+      to{opacity:1;}
+    }
+
+    .subtitle{
+	  font-size:20px;
+      letter-spacing:5px;
+      color:#9be7ff;
+      margin-bottom:40px;
+    }
+
+    .equations{
+      display:flex;
+      gap:50px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin-bottom:20px;
+      color:cyan;
+      font-size:40px;
+    }
+
+    .equations div{
+      animation:float 2s infinite ease-in-out;
+    }
+
+    @keyframes float{
+      0%,100%{transform:translateY(0);}
+      50%{transform:translateY(-10px);}
+    }
+
+    input{
+      width:500px;
+      padding:18px;
+      border-radius:15px;
+      border:2px solid cyan;
+      background:rgba(255,255,255,0.05);
+      color:white;
+      text-align:center;
+      font-size:30px;
+      outline:none;
+    }
+
+    button{
+      margin-top:20px;
+      padding:16px 35px;
+      border:none;
+      border-radius:15px;
+      background:cyan;
+      color:black;
+      font-weight:bold;
+      cursor:pointer;
+      font-size:30px;
+      transition:0.3s;
+      box-shadow:0 0 25px cyan;
+    }
+
+    button:hover{
+      transform:scale(1.05);
+    }
+
+    /* TERMINAL */
+    #terminalScreen{
+      display:none;
+      position:absolute;
+      inset:0;
+      background:matrix;
+      z-index:20;
+      padding:60px;
+      color:#00ff99;
+      font-size:36px;
+      line-height:1.8;
+    }
+
+    #terminalText{
+      white-space:pre-wrap;
+    }
+
+    /* 🔥 ADDED FINAL LINE EFFECT */
+    .terminalLine{
+      transition:1.5s;
+    }
+
+    .fadeBack{
+      opacity:0.15;
+    }
+
+    #finalReveal{
+	  position: absolute;
+	  top: 50%;
+	  left: 50%;
+	  transform: translate(-50%, -50%) scale(0.5);
+	  font-size: 45px;
+	  color: cyan;
+	  text-align: center;
+	  opacity: 0;
+	  transition: 1.8s ease;
+	  z-index: 999;
+	  will-change: transform, opacity;
+	}
+
+   #finalReveal.active{
+	  opacity: 1;
+	  transform: translate(-50%, -50%) scale(2.8);
+	  text-shadow: 0 0 25px cyan, 0 0 60px white, 0 0 120px blue;
+	}
+
+    /* TRANSITION */
+    #transition{
+      display:none;
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      background:black;
+      z-index:40;
+    }
+
+    .eq{
+      position:absolute;
+      font-weight:bold;
+      animation:rise linear forwards;
+      text-shadow:0 0 20px cyan;
+    }
+
+    @keyframes rise{
+      from{
+        transform:translateY(100vh) rotate(0deg);
+        opacity:0;
+      }
+      10%{opacity:1;}
+      to{
+        transform:translateY(-120vh) rotate(360deg);
+        opacity:0;
+      }
+    }
+
+    #transitionTitle{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      text-align:center;
+      z-index:10;
+    }
+
+    #transitionTitle h2{
+      font-size:70px;
+      background:linear-gradient(to right, cyan, white, violet);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      animation:pulse 2s infinite;
+    }
+
+    @keyframes pulse{
+      0%,100%{transform:scale(1);}
+      50%{transform:scale(1.05);}
+    }
+
+    #transitionTitle p{
+      margin-top:20px;
+      letter-spacing:6px;
+      color:cyan;
+      font-size:24px;
+    }
+
+    /* EVENT WORD REVEAL */
+    #eventReveal{
+      display:none;
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,0.35);
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
+      z-index:60;
+      text-align:center;
+      overflow:hidden;
+    }
+
+    .eventWord{
+  position:relative;
+  z-index:80;
+  font-size:150px;
+  color:cyan;
+  letter-spacing:10px;
+  opacity:0;
+  backdrop-filter: blur(2px);
+  transform:perspective(800px) rotateY(-75deg) scale(1.8);
+  text-shadow:
+    0 0 25px cyan,
+    0 0 70px white,
+    0 0 140px blue;
+  animation:eventWordReveal 1.8s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+.eventWord::before,
+.eventWord::after{
+  content:attr(data-text);
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0.7;
+}
+
+.eventWord::before{
+  color:#60a5fa;
+  transform:translateX(-8px);
+  clip-path:polygon(0 0,100% 0,100% 45%,0 45%);
+}
+
+.eventWord::after{
+  color:white;
+  transform:translateX(8px);
+  clip-path:polygon(0 55%,100% 55%,100% 100%,0 100%);
+}
+
+.eventWord.revealed{
+  opacity:1;
+}
+
+@keyframes eventWordReveal{
+  0%{
+    opacity:0;
+    transform:perspective(800px) rotateY(-80deg) scale(2.2) skewX(12deg);
+    filter:blur(12px);
+  }
+
+  35%{
+    opacity:1;
+    transform:perspective(800px) rotateY(25deg) scale(1.25) skewX(-8deg);
+    filter:blur(2px);
+  }
+
+  65%{
+    transform:perspective(800px) rotateY(-8deg) scale(1.08);
+    filter:blur(0);
+  }
+
+  100%{
+    opacity:1;
+    transform:perspective(800px) rotateY(0deg) scale(1);
+    filter:blur(0);
+  }
+}
+
+/* =========================
+   EINSTEIN WORMHOLE
+========================= */
+
+#wormhole{
+  display:none;
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(0,255,255,0.35) 8%, transparent 18%),
+    radial-gradient(circle at 50% 50%, rgba(124,58,237,0.35), transparent 45%),
+    radial-gradient(circle at center, #020617 0%, #000 75%);
+  z-index:88;
+}
+
+#wormhole::before{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent,
+      rgba(0,255,255,0.12),
+      rgba(255,255,255,0.35),
+      rgba(124,58,237,0.18),
+      transparent,
+      rgba(96,165,250,0.25),
+      transparent
+    );
+  border-radius:50%;
+  animation:wormSpin 5s linear infinite;
+  filter:blur(8px);
+}
+
+#wormhole::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at center, transparent 0%, transparent 15%, rgba(0,0,0,0.15) 25%, rgba(0,0,0,0.9) 75%);
+  animation:wormPulse 2s ease-in-out infinite alternate;
+}
+
+.wormStar{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:2px;
+  height:100px;
+  border-radius:999px;
+  background:linear-gradient(to bottom, white, cyan, transparent);
+  opacity:0;
+  z-index:85;
+}
+
+@keyframes wormSpin{
+  from{
+    transform:rotate(0deg) scale(1.2);
+  }
+  to{
+    transform:rotate(360deg) scale(1.2);
+  }
+}
+
+@keyframes wormPulse{
+  from{
+    filter:brightness(1);
+  }
+  to{
+    filter:brightness(1.5);
+  }
+}
+
+/* =========================
+   SPACESHIP WORMHOLE TRAVEL
+========================= */
+
+#spaceTravel{
+  display:none;
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  background:transparent;
+  z-index:90;
+  pointer-events:none;
+}
+
+.warpLine{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:3px;
+  height:120px;
+  background:linear-gradient(to bottom, white, cyan, transparent);
+  border-radius:999px;
+  opacity:0;
+}
+
+#spaceship{
+  position:absolute;
+  left:50%;
+  bottom:8%;
+  transform:translateX(-50%);
+  width:200px;
+  height:300px;
+  z-index:95;
+  filter:drop-shadow(0 0 25px cyan);
+}
+
+#spaceship::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:0;
+  transform:translateX(-50%);
+  width:90px;
+  height:160px;
+  background:linear-gradient(to bottom, white, #60a5fa, #1e3a8a);
+  clip-path:polygon(50% 0%, 95% 75%, 65% 100%, 35% 100%, 5% 75%);
+  border-radius:40px;
+}
+
+#spaceship::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:45px;
+  height:90px;
+  background:linear-gradient(to bottom, orange, red, transparent);
+  filter:blur(6px);
+  animation:engineFlame 0.18s infinite alternate;
+}
+
+@keyframes engineFlame{
+  from{
+    height:70px;
+    opacity:0.7;
+  }
+  to{
+    height:120px;
+    opacity:1;
+  }
+}
+
+#cockpit{
+  position:absolute;
+  left:50%;
+  top:42px;
+  transform:translateX(-50%);
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:radial-gradient(circle, white, cyan, #1e3a8a);
+  box-shadow:0 0 25px cyan;
+  z-index:96;
+}
+
+/* CINEMATIC CROSSFADE */
+#cinematicFade{
+  display:none;
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,0.85) 0%, rgba(0,255,255,0.45) 12%, rgba(0,0,0,0.9) 45%, black 100%);
+  opacity:0;
+  z-index:500;
+  pointer-events:none;
+  filter:blur(0px);
+}
+
+  </style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+<canvas id="particles"></canvas>
+
+<!-- MAIN -->
+<div id="main">
+
+  <h1>WHAT'S THE TITLE OF THIS EVENT?</h1>
+
+  <div class="equations">
+    <div>E=mc²</div>
+	<div>ψ(x,t)</div>
+    <div>iħ ∂ψ/∂t = Ĥψ</div>
+    <div>"∇²ψ + k²ψ = 0</div>
+  </div>
+
+  <input type="text" id="codeInput" placeholder="Enter Launch Code">
+
+  <button onclick="launchSystem()">INITIALIZE</button>
+
+</div>
+
+<!-- TERMINAL -->
+<div id="terminalScreen">
+  <div id="terminalText"></div>
+</div>
+
+<!-- TRANSITION -->
+<div id="transition">
+
+  <div id="transitionTitle">
+    <h2>·APPLY PHYSICS·</h2>
+	<h2>·SOLVE PROBLEMS·</h2>
+	<h2>·INNOVATE SOLUTIONS·</h2>
+  </div>
+
+</div>
+
+<div id="wormhole"></div>
+<div id="spaceTravel">
+  <div id="spaceship">
+    <div id="cockpit"></div>
+  </div>
+</div>
+<audio id="countSound" src="countdown.mp3"></audio>
+
+<audio id="bgMusic" src="interstellar.mp3"></audio>
+
+<audio id="wormholeSound" src="wormhole.mp3"></audio>
+
+<!-- EVENT WORD REVEAL -->
+<div id="eventReveal"></div>
+
+<div id="cinematicFade"></div>
+
+<script>
+
+const accessCode = "NPH 2026";
+
+const terminalLines = [
+  ">>> AUTHORIZATION SEQUENCE INITIATED",
+  "Quantum Core handshake successful...",
+  "Decoding physics lattice structure...",
+  "Stabilizing spacetime fluctuations...",
+  "Neural simulation engine ONLINE...",
+  "Reality breach detected...",
+  "Locking dimensional constants...",
+  "Synchronizing multi-universe parameters...",
+  "WARNING: Temporal instability rising...",
+  "Override accepted by system...",
+  "Hackathon realm unlocked...",
+  "FINAL ACCESS GRANTED",
+  "WELCOME, EVERYONE"
+];
+
+function launchSystem(){
+
+  const input = document.getElementById("codeInput").value.trim().toUpperCase();
+
+  if(input !== accessCode){
+    alert("ACCESS DENIED");
+    return;
+  }
+
+  document.getElementById("main").style.display = "none";
+  
+  playMusic(48, 0);
+  fadeMusicTo(0.80, 8000);
+
+  const terminalScreen = document.getElementById("terminalScreen");
+  const terminalText = document.getElementById("terminalText");
+
+  terminalScreen.style.display = "block";
+
+  let i = 0;
+
+  const interval = setInterval(()=>{
+
+    if(i >= terminalLines.length){
+      clearInterval(interval);
+      setTimeout(startTransition,10000);
+      return;
+    }
+
+    const line = terminalLines[i];
+
+    // 🔥 FINAL LINE EFFECT
+    if(line === "WELCOME, EVERYONE"){
+
+     const finalDiv = document.createElement("div");
+     finalDiv.id = "finalReveal";
+     finalDiv.textContent = line;
+     terminalText.appendChild(finalDiv);
+
+      document.querySelectorAll(".terminalLine").forEach(el=>{
+        el.classList.add("fadeBack");
+      });
+
+      clearInterval(interval);
+
+      setTimeout(()=>{
+        document.getElementById("finalReveal").classList.add("active");
+      },1000);
+
+      setTimeout(()=>{
+        startTransition();
+      },5000	);
+
+      return;
+    }
+
+    const div = document.createElement("div");
+    div.className = "terminalLine";
+    div.textContent = "• " + line;
+    terminalText.appendChild(div);
+
+    i++;
+
+  },900);
+
+}
+
+function startTransition(){
+
+  document.getElementById("terminalScreen").style.display = "none";
+
+  const transition = document.getElementById("transition");
+
+  transition.style.display = "block";
+
+  const equations = [
+    "E = mc²",
+    "∫Ldt",
+    "ΔxΔp ≥ ħ/2",
+    "ψ(x,t)",
+    "Schrödinger Equation",
+    "quantum.compute();",
+    "HackTheFuture();",
+    "AI.learn(physics);",
+    "∇²ψ + k²ψ = 0",
+    "F = ma",
+    "Neural Physics Core",
+    "Machine Learning Active"
+  ];
+
+  for(let i=0;i<140;i++){
+
+    const eq = document.createElement("div");
+    eq.classList.add("eq");
+    eq.innerHTML = equations[Math.floor(Math.random()*equations.length)];
+    eq.style.left = Math.random()*100 + "%";
+    eq.style.fontSize = (16 + Math.random()*40) + "px";
+    eq.style.color = ["cyan","white","#7c3aed","#60a5fa"][Math.floor(Math.random()*4)];
+    eq.style.animationDuration = (25 + Math.random()*20) + "s";
+    eq.style.animationDelay = Math.random()*5 + "s";
+    transition.appendChild(eq);
+  }
+
+
+  setTimeout(()=>{
+     ultimateCinematicReveal();
+  },23000);
+
+}
+
+
+function showEventReveal(){
+
+
+  document.getElementById("transition").style.display = "none";
+  document.getElementById("eventReveal").style.display = "flex";
+
+  const reveal = document.getElementById("eventReveal");
+  reveal.innerHTML = "";
+
+  const words = ["NATIONAL", "PHYSXHACKATHON", "2026"];
+
+  let i = 0;
+
+  function revealNextWord(){
+
+    if(i >= words.length) return;
+
+    const word = document.createElement("div");
+    word.className = "eventWord";
+    word.textContent = words[i];
+
+    reveal.appendChild(word);
+
+    i++;
+
+    setTimeout(revealNextWord, 900);
+  }
+
+  revealNextWord();
+
+}
+
+/* PARTICLES (UNCHANGED) */
+
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles = [];
+
+for(let i=0;i<120;i++){
+  particles.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*3,
+    dx:(Math.random()-0.5)*1.5,
+    dy:(Math.random()-0.5)*1.5
+  });
+}
+
+function animateParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle="rgba(0,255,255,0.7)";
+    ctx.fill();
+
+    p.x+=p.dx;
+    p.y+=p.dy;
+
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+  });
+
+  requestAnimationFrame(animateParticles);
+
+}
+
+animateParticles();
+/* =========================
+   SPACE WARP BACKGROUND
+========================= */
+
+const stars = [];
+
+for(let i=0;i<300;i++){
+
+  stars.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    z:Math.random()*canvas.width
+  });
+
+}
+
+function animateWarp(){
+
+  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  for(let star of stars){
+
+    star.z -= 8;
+
+    if(star.z <= 0){
+      star.z = canvas.width;
+    }
+
+    let k = 128.0 / star.z;
+
+    let px = star.x * k + canvas.width/2;
+    let py = star.y * k + canvas.height/2;
+
+    if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height){
+
+      let size = (1 - star.z / canvas.width) * 4;
+
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.arc(px,py,size,0,Math.PI*2);
+      ctx.fill();
+
+    }
+
+  }
+
+  requestAnimationFrame(animateWarp);
+
+}
+
+/* =========================
+   SHOOTING STARS
+========================= */
+
+function createShootingStar(){
+
+  const star = document.createElement("div");
+
+  star.style.position = "absolute";
+  star.style.width = "3px";
+  star.style.height = "150px";
+  star.style.background = "linear-gradient(to bottom, white, transparent)";
+  star.style.left = Math.random()*window.innerWidth + "px";
+  star.style.top = "-200px";
+  star.style.transform = "rotate(45deg)";
+  star.style.opacity = "0.9";
+  star.style.zIndex = "3";
+
+  document.body.appendChild(star);
+
+  star.animate([
+    {
+      transform:"translate(0,0) rotate(45deg)",
+      opacity:1
+    },
+    {
+      transform:"translate(700px,700px) rotate(45deg)",
+      opacity:0
+    }
+  ],{
+    duration:10000
+  });
+
+  setTimeout(()=>{
+    star.remove();
+  },2000);
+
+}
+
+setInterval(createShootingStar,5000);
+
+/* =========================
+   BLACK HOLE EFFECT
+========================= */
+
+function createBlackHole(){
+
+  const hole = document.createElement("div");
+
+  hole.style.position = "absolute";
+  hole.style.left = "50%";
+  hole.style.top = "50%";
+  hole.style.transform = "translate(-50%,-50%)";
+  hole.style.width = "50px";
+  hole.style.height = "50px";
+  hole.style.borderRadius = "50%";
+  hole.style.background = "black";
+  hole.style.boxShadow = `
+    0 0 80px cyan,
+    0 0 150px blue,
+    0 0 250px purple
+  `;
+  hole.style.zIndex = "5";
+
+  document.body.appendChild(hole);
+
+  hole.animate([
+    {
+      transform:"translate(-50%,-50%) scale(1)",
+      opacity:1
+    },
+    {
+      transform:"translate(-50%,-50%) scale(15)",
+      opacity:0
+    }
+  ],{
+    duration:10000,
+    easing:"ease-out"
+  });
+
+  setTimeout(()=>{
+    hole.remove();
+  },6000);
+
+}
+
+/* =========================
+   START SPACE WARP
+========================= */
+
+animateWarp();
+
+/* =========================
+   BIG BANG EFFECT
+========================= */
+
+const bigBang = document.createElement("div");
+
+bigBang.style.position = "absolute";
+bigBang.style.top = "50%";
+bigBang.style.left = "50%";
+bigBang.style.width = "20px";
+bigBang.style.height = "20px";
+bigBang.style.borderRadius = "50%";
+bigBang.style.background = "white";
+bigBang.style.transform = "translate(-50%,-50%) scale(0)";
+bigBang.style.zIndex = "200";
+bigBang.style.pointerEvents = "none";
+bigBang.style.opacity = "0";
+
+document.body.appendChild(bigBang);
+
+function triggerBigBang(){
+
+  bigBang.style.opacity = "1";
+
+  bigBang.animate([
+
+    {
+      transform:"translate(-50%,-50%) scale(0)",
+      opacity:1,
+      boxShadow:"0 0 0px white"
+    },
+
+    {
+      transform:"translate(-50%,-50%) scale(80)",
+      opacity:0,
+      boxShadow:`
+      0 0 100px cyan,
+      0 0 200px white,
+      0 0 400px blue,
+      0 0 600px purple`
+    }
+
+  ],{
+
+    duration:4000,
+    easing:"ease-out"
+
+  });
+
+}
+
+/* =========================
+   UNIVERSE EXPANSION
+========================= */
+
+function createUniverse(){
+
+  for(let i=0;i<300;i++){
+
+    const star = document.createElement("div");
+
+    star.style.position = "absolute";
+    star.style.width = "3px";
+    star.style.height = "3px";
+    star.style.borderRadius = "50%";
+    star.style.background = "white";
+
+    star.style.left = "50%";
+    star.style.top = "50%";
+
+    star.style.zIndex = "5";
+
+    document.body.appendChild(star);
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * 1800;
+
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+
+    star.animate([
+
+      {
+        transform:"translate(0,0) scale(0)",
+        opacity:1
+      },
+
+      {
+        transform:`translate(${x}px,${y}px) scale(1.5)`,
+        opacity:0
+      }
+
+    ],{
+
+      duration:5000,
+      easing:"ease-out"
+
+    });
+
+    setTimeout(()=>{
+      star.remove();
+    },5000);
+
+  }
+
+}
+
+/* =========================
+   MATRIX BINARY RAIN
+========================= */
+
+const matrixStyle = document.createElement("style");
+
+matrixStyle.innerHTML = `
+
+.binaryColumn{
+  position:absolute;
+  top:-100%;
+  color:#00ff88;
+  font-size:20px;
+  font-family:monospace;
+  white-space:pre;
+  opacity:0.7;
+  text-shadow:0 0 10px #00ff88;
+  animation:matrixFall linear forwards;
+  z-index:65;
+}
+
+@keyframes matrixFall{
+
+  from{
+    transform:translateY(-100vh);
+    opacity:0;
+  }
+
+  10%{
+    opacity:1;
+  }
+
+  to{
+    transform:translateY(220vh);
+    opacity:0;
+  }
+
+}
+`;
+
+document.head.appendChild(matrixStyle);
+
+function createBinaryRain(){
+
+  const chars = "010101010101010101";
+
+  const binary = document.createElement("div");
+
+  binary.classList.add("binaryColumn");
+
+  let text = "";
+
+  for(let i=0;i<40;i++){
+
+    text += chars[Math.floor(Math.random()*chars.length)] + "\n";
+
+  }
+
+  binary.innerText = text;
+
+  binary.style.left = Math.random()*window.innerWidth + "px";
+
+  binary.style.animationDuration = (4 + Math.random()*5) + "s";
+
+  binary.style.fontSize = (14 + Math.random()*18) + "px";
+
+  document.body.appendChild(binary);
+
+  setTimeout(()=>{
+    binary.remove();
+  },9000);
+
+}
+
+/* =========================
+   START MATRIX RAIN
+========================= */
+
+setInterval(createBinaryRain,220);
+
+/* =========================
+   TRIGGER BIG BANG + UNIVERSE
+========================= */
+
+const oldStartTransition = startTransition;
+
+startTransition = function(){
+
+  triggerBigBang();
+
+  createUniverse();
+
+  oldStartTransition();
+
+}
+/* =========================
+   CINEMATIC SUN BLAST
+========================= */
+
+function createSunBlast(){
+
+  const sun = document.createElement("div");
+
+  sun.style.position = "absolute";
+  sun.style.left = "50%";
+  sun.style.top = "50%";
+  sun.style.width = "150px";
+  sun.style.height = "150px";
+  sun.style.borderRadius = "50%";
+
+  sun.style.background = `
+    radial-gradient(circle,
+    white 0%,
+    yellow 20%,
+    orange 45%,
+    red 70%,
+    transparent 100%)
+  `;
+
+  sun.style.transform = "translate(-50%,-50%) scale(0.2)";
+
+  sun.style.boxShadow = `
+    0 0 80px yellow,
+    0 0 160px orange,
+    0 0 260px red
+  `;
+
+  sun.style.zIndex = "150";
+
+  document.body.appendChild(sun);
+
+  sun.animate([
+
+    {
+      transform:"translate(-50%,-50%) scale(0.2)",
+      opacity:1
+    },
+
+    {
+      transform:"translate(-50%,-50%) scale(7)",
+      opacity:0
+    }
+
+  ],{
+
+    duration:5000,
+    easing:"ease-out"
+
+  });
+
+  setTimeout(()=>{
+    sun.remove();
+  },5000);
+
+}
+
+/* =========================
+   PLANETS FLOATING
+========================= */
+
+function createPlanet(size,color,shadow,left,duration){
+
+  const planet = document.createElement("div");
+
+  planet.style.position = "absolute";
+
+  planet.style.width = size + "px";
+  planet.style.height = size + "px";
+
+  planet.style.borderRadius = "50%";
+
+  planet.style.background = color;
+
+  planet.style.boxShadow = shadow;
+
+  planet.style.top = Math.random()*80 + "%";
+
+  planet.style.left = left;
+
+  planet.style.zIndex = "4";
+
+  document.body.appendChild(planet);
+
+  planet.animate([
+
+    {
+      transform:"translateX(-200px) rotate(0deg)",
+      opacity:0
+    },
+
+    {
+      opacity:1
+    },
+
+    {
+      transform:"translateX(2200px) rotate(720deg)",
+      opacity:0
+    }
+
+  ],{
+
+    duration:duration,
+    easing:"linear"
+
+  });
+
+  setTimeout(()=>{
+    planet.remove();
+  },duration);
+
+}
+
+/* =========================
+   SPAWN PLANETS
+========================= */
+
+function spawnPlanets(){
+
+  createPlanet(
+    120,
+    "radial-gradient(circle at 30% 30%, #60a5fa, #1e3a8a)",
+    "0 0 50px #60a5fa",
+    "-10%",
+    18000
+  );
+
+  createPlanet(
+    80,
+    "radial-gradient(circle at 30% 30%, #f97316, #7c2d12)",
+    "0 0 40px orange",
+    "-20%",
+    14000
+  );
+
+  createPlanet(
+    200,
+    "radial-gradient(circle at 30% 30%, #c4b5fd, #4c1d95)",
+    "0 0 70px violet",
+    "-15%",
+    22000
+  );
+
+}
+
+/* =========================
+   ASTEROIDS
+========================= */
+
+function createAsteroid(){
+
+  const rock = document.createElement("div");
+
+  rock.style.position = "absolute";
+
+  rock.style.width = (20 + Math.random()*50) + "px";
+  rock.style.height = rock.style.width;
+
+  rock.style.borderRadius = "50%";
+
+  rock.style.background = `
+    radial-gradient(circle at 30% 30%,
+    #999,
+    #444,
+    #111)
+  `;
+
+  rock.style.boxShadow = "0 0 20px #999";
+
+  rock.style.left = "-10%";
+  rock.style.top = Math.random()*100 + "%";
+
+  rock.style.zIndex = "2";
+
+  document.body.appendChild(rock);
+
+  rock.animate([
+
+    {
+      transform:"translateX(0) translateY(0) rotate(0deg)",
+      opacity:1
+    },
+
+    {
+      transform:`
+      translateX(${window.innerWidth+500}px)
+      translateY(${Math.random()*600-300}px)
+      rotate(720deg)
+      `,
+      opacity:0
+    }
+
+  ],{
+
+    duration:7000,
+    easing:"linear"
+
+  });
+
+  setTimeout(()=>{
+    rock.remove();
+  },7000);
+
+}
+
+/* =========================
+   START SPACE EVENTS
+========================= */
+
+setInterval(createAsteroid,2500);
+
+setInterval(spawnPlanets,12000);
+
+/* =========================
+   ULTIMATE CINEMATIC REVEAL
+========================= */
+
+function playMusic(startTime, volume = 1){
+
+  const bgMusic = document.getElementById("bgMusic");
+
+  bgMusic.pause();
+
+  bgMusic.currentTime = startTime;
+
+  bgMusic.volume = volume;
+
+  bgMusic.play().catch(err=>{
+    console.log("Music blocked:", err);
+  });
+
+}
+
+function fadeMusicTo(targetVolume, duration = 3000){
+
+  const bgMusic = document.getElementById("bgMusic");
+
+  const startVolume = bgMusic.volume;
+
+  const steps = 30;
+
+  let step = 0;
+
+  const fade = setInterval(()=>{
+
+    step++;
+
+    bgMusic.volume =
+      startVolume +
+      ((targetVolume - startVolume) * step / steps);
+
+    if(step >= steps){
+
+      bgMusic.volume = targetVolume;
+
+      clearInterval(fade);
+
+    }
+
+  }, duration / steps);
+
+}
+
+function ultimateCinematicReveal(){
+
+  /* HIDE TRANSITION TEXT */
+  document.getElementById("transitionTitle").style.opacity = "0";
+
+  /* --------------------------------
+     STAGE 1 — BIG BANG
+  -------------------------------- */
+
+  triggerBigBang();
+
+  createUniverse();
+
+
+  /* --------------------------------
+     STAGE 2 — SUN EXPLOSION
+  -------------------------------- */
+
+  setTimeout(()=>{
+
+    createSunBlast();
+
+  },3000);
+
+  /* --------------------------------
+     STAGE 3 — PLANETS + ASTEROIDS
+  -------------------------------- */
+
+  setTimeout(()=>{
+
+    spawnPlanets();
+
+  },5000);
+
+  const asteroidInterval = setInterval(()=>{
+
+    createAsteroid();
+
+  },1200);
+
+  /* --------------------------------
+     STAGE 4 — WORMHOLE ENTRY
+  -------------------------------- */
+
+  setTimeout(()=>{
+
+    startWormhole();
+	
+	startSpaceTravel();
+
+  },9000);
+
+/* --------------------------------
+   STAGE 5 — COUNTDOWN ONLY
+-------------------------------- */
+
+setTimeout(()=>{
+
+  let count = 5;
+
+  const countdownInterval = setInterval(()=>{
+
+    /* PLAY COUNTDOWN SOUND */
+    const countAudio = document.getElementById("countSound");
+
+    countAudio.currentTime = 0;
+    countAudio.volume = 0.7;
+
+    countAudio.play().catch(err=>{
+      console.log("Audio blocked:", err);
+    });
+
+    /* COUNTDOWN NUMBER */
+    const number = document.createElement("div");
+
+    number.innerText = count;
+
+    number.style.position = "absolute";
+    number.style.top = "50%";
+    number.style.left = "50%";
+
+    number.style.transform = "translate(-50%,-50%)";
+
+    number.style.fontSize = "220px";
+    number.style.fontWeight = "bold";
+
+    number.style.color = "white";
+
+    number.style.textShadow = `
+      0 0 20px cyan,
+      0 0 50px white,
+      0 0 100px blue
+    `;
+
+    number.style.zIndex = "350";
+
+    number.style.pointerEvents = "none";
+
+    document.body.appendChild(number);
+
+    number.animate([
+
+      {
+        transform:"translate(-50%,-50%) scale(0.2)",
+        opacity:0
+      },
+
+      {
+        transform:"translate(-50%,-50%) scale(1)",
+        opacity:1
+      },
+
+      {
+        transform:"translate(-50%,-50%) scale(2)",
+        opacity:0
+      }
+
+    ],{
+
+      duration:900,
+      easing:"cubic-bezier(0.16,1,0.3,1)"
+
+    });
+
+    setTimeout(()=>{
+      number.remove();
+    },900);
+
+    if(count === 1){
+
+  setTimeout(()=>{
+
+    clearInterval(countdownInterval);
+
+    const countAudio = document.getElementById("countSound");
+
+    countAudio.pause();
+    countAudio.currentTime = 0;
+
+  },900);
+
+}
+
+count--;
+
+  },1000);
+
+},17500);
+
+  /* --------------------------------
+     STAGE 6 — FINAL EVENT NAME REVEAL
+  -------------------------------- */
+
+  /* --------------------------------
+   STAGE 6 — FINAL EVENT NAME REVEAL
+-------------------------------- */
+
+setTimeout(()=>{
+
+  const fade = document.getElementById("cinematicFade");
+
+  fade.style.display = "block";
+
+  fade.animate([
+    {opacity:0, filter:"blur(0px)", transform:"scale(1)"},
+    {opacity:0.8, filter:"blur(2px)", transform:"scale(1.04)"},
+    {opacity:1, filter:"blur(5px)", transform:"scale(1.1)"},
+    {opacity:0, filter:"blur(0px)", transform:"scale(1.18)"}
+  ],{
+    duration:5200,
+    easing:"cubic-bezier(0.16,1,0.3,1)"
+  });
+
+  setTimeout(()=>{
+
+    document.getElementById("transition").style.display = "none";
+    document.getElementById("wormhole").style.display = "none";
+    document.getElementById("spaceTravel").style.display = "none";
+
+    const reveal = document.getElementById("eventReveal");
+
+    playMusic(188,0.45);
+    fadeMusicTo(1,4000);
+
+    reveal.style.display = "flex";
+    reveal.innerHTML = "";
+
+    const words = ["NATIONAL", "PHYSXHACKATHON", "2026"];
+
+    let wordIndex = 0;
+
+    function revealWord(){
+
+      if(wordIndex >= words.length){
+        return;
+      }
+
+      const word = document.createElement("div");
+
+      word.className = "eventWord";
+      word.textContent = words[wordIndex];
+      word.setAttribute("data-text", words[wordIndex]);
+
+      reveal.appendChild(word);
+
+      wordIndex++;
+
+      setTimeout(revealWord,5000);
+
+    }
+
+    revealWord();
+
+  },2800);
+
+  setTimeout(()=>{
+    fade.style.display = "none";
+  },5500);
+
+},25500);
+
+}
+
+/* =========================
+   SPACESHIP WORMHOLE TRAVEL
+========================= */
+
+function startSpaceTravel(){
+
+  const travel = document.getElementById("spaceTravel");
+  travel.style.display = "block";
+  travel.innerHTML = `
+    <div id="spaceship">
+      <div id="cockpit"></div>
+    </div>
+  `;
+
+  for(let i=0;i<180;i++){
+
+    const line = document.createElement("div");
+    line.classList.add("warpLine");
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * 60;
+
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+
+    line.style.transform = `
+      translate(${x}px, ${y}px)
+      rotate(${angle}rad)
+      scale(0.2)
+    `;
+
+    travel.appendChild(line);
+
+    line.animate([
+
+      {
+        transform:`
+          translate(${x}px, ${y}px)
+          rotate(${angle}rad)
+          scale(0.2)
+        `,
+        opacity:0
+      },
+
+      {
+        opacity:1
+      },
+
+      {
+        transform:`
+          translate(${x*45}px, ${y*45}px)
+          rotate(${angle}rad)
+          scale(3.5)
+        `,
+        opacity:0
+      }
+
+    ],{
+      duration:2800 + Math.random()*1200,
+      easing:"cubic-bezier(0.16,1,0.3,1)"
+    });
+
+  }
+
+const ship = document.getElementById("spaceship");
+
+const shipAnimation = ship.animate([
+
+    {
+      transform:"translateX(-50%) translateY(0) scale(1)",
+      opacity:1
+    },
+
+    {
+      transform:"translateX(-50%) translateY(-80px) scale(1.1)",
+      opacity:1
+    },
+
+    {
+      transform:"translateX(-50%) translateY(-260px) scale(0.35)",
+      opacity:0
+    }
+
+  ],{
+    duration:5200,
+    easing:"cubic-bezier(0.16,1,0.3,1)",
+	fill:"forwards"
+  });
+  
+	setTimeout(()=>{
+  const ship = document.getElementById("spaceship");
+
+  if(ship){
+    ship.style.opacity = "0";
+    ship.style.display = "none";
+  }
+
+  travel.style.display = "none";
+  travel.innerHTML = "";
+},5000);
+  
+}
+
+/* =========================
+   EINSTEIN WORMHOLE EFFECT
+========================= */
+
+function startWormhole(){
+
+  const wormholeAudio = document.getElementById("wormholeSound");
+
+  wormholeAudio.volume = 0.5;
+  wormholeAudio.play();
+
+  const wormhole = document.getElementById("wormhole");
+
+  wormhole.innerHTML = "";
+  wormhole.style.display = "block";
+
+  for(let i=0;i<160;i++){
+
+    const star = document.createElement("div");
+
+    star.classList.add("wormStar");
+
+    wormhole.appendChild(star);
+
+    const angle = Math.random() * Math.PI * 2;
+    const startDistance = 20 + Math.random() * 80;
+    const endDistance = 900 + Math.random() * 900;
+
+    const startX = Math.cos(angle) * startDistance;
+    const startY = Math.sin(angle) * startDistance;
+
+    const endX = Math.cos(angle) * endDistance;
+    const endY = Math.sin(angle) * endDistance;
+
+    star.style.transform = `
+      translate(${startX}px, ${startY}px)
+      rotate(${angle + Math.PI / 2}rad)
+      scale(0.2)
+    `;
+
+    star.animate([
+
+      {
+        transform:`
+          translate(${startX}px, ${startY}px)
+          rotate(${angle + Math.PI / 2}rad)
+          scale(0.1)
+        `,
+        opacity:0
+      },
+
+      {
+        opacity:1
+      },
+
+      {
+        transform:`
+          translate(${endX}px, ${endY}px)
+          rotate(${angle + Math.PI / 2}rad)
+          scale(3)
+        `,
+        opacity:0
+      }
+
+    ],{
+      duration:3500 + Math.random()*3000,
+      delay:Math.random()*1000,
+      easing:"cubic-bezier(0.16,1,0.3,1)"
+    });
+
+  }
+
+}
+</script>
+</body>
+</html>
