@@ -140,7 +140,7 @@
 
     /* 🔥 ADDED FINAL LINE EFFECT */
     .terminalLine{
-      transition:1.5s;
+      transition:0.8s;
     }
 
     .fadeBack{
@@ -161,11 +161,14 @@
 	  will-change: transform, opacity;
 	}
 
-   #finalReveal.active{
-	  opacity: 1;
-	  transform: translate(-50%, -50%) scale(2.8);
-	  text-shadow: 0 0 25px cyan, 0 0 60px white, 0 0 120px blue;
-	}
+  #finalReveal.active{
+  opacity:1;
+  transform:translate(-50%, -50%) scale(2.1);
+  text-shadow:
+    0 0 12px cyan,
+    0 0 30px white,
+    0 0 55px #60a5fa;
+}
 
     /* TRANSITION */
     #transition{
@@ -206,7 +209,7 @@
     }
 
     #transitionTitle h2{
-      font-size:55px;
+      font-size:50px;
       background:linear-gradient(to right, cyan, white, violet);
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
@@ -242,7 +245,7 @@
     .eventWord{
   position:relative;
   z-index:80;
-  font-size:117px;
+  font-size:105px;
   color:cyan;
   letter-spacing:10px;
   opacity:0;
@@ -714,7 +717,7 @@ function startTransition(){
 
   setTimeout(()=>{
      ultimateCinematicReveal();
-  },23000);
+  },30000);
 
 }
 
@@ -1120,7 +1123,7 @@ function createBinaryRain(){
    START MATRIX RAIN
 ========================= */
 
-setInterval(createBinaryRain,220);
+setInterval(createBinaryRain,500);
 
 /* =========================
    TRIGGER BIG BANG + UNIVERSE
