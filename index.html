@@ -148,26 +148,32 @@
     }
 
     #finalReveal{
-	  position: absolute;
-	  top: 50%;
-	  left: 50%;
-	  transform: translate(-50%, -50%) scale(0.5);
-	  font-size: 35px;
-	  color: cyan;
-	  text-align: center;
-	  opacity: 0;
-	  transition: 1.8s ease;
-	  z-index: 999;
-	  will-change: transform, opacity;
-	}
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate3d(-50%, -50%, 0) scale(0.5);
+  font-size:45px;
+  color:cyan;
+  text-align:center;
+  opacity:0;
+  transition:transform 1.8s cubic-bezier(0.16,1,0.3,1), opacity 1.2s ease;
+  z-index:999;
+  will-change:transform, opacity;
+  backface-visibility:hidden;
+}
 
-  #finalReveal.active{
+	#finalReveal::after{
+  content:attr(data-text);
+  position:absolute;
+  inset:0;
+  color:cyan;
+  filter:drop-shadow(0 0 12px cyan) drop-shadow(0 0 30px #60a5fa);
+  z-index:-1;
+}
+
+	#finalReveal.active{
   opacity:1;
-  transform:translate(-50%, -50%) scale(2.1);
-  text-shadow:
-    0 0 12px cyan,
-    0 0 30px white,
-    0 0 55px #60a5fa;
+  transform:translate3d(-50%, -50%, 0) scale(2.1);
 }
 
     /* TRANSITION */
@@ -549,7 +555,7 @@
     <div>E=mc²</div>
 	<div>ψ(x,t)</div>
     <div>iħ ∂ψ/∂t = Ĥψ</div>
-    <div>"∇²ψ + k²ψ = 0</div>
+    <div>∇²ψ + k²ψ = 0</div>
   </div>
 
   <input type="text" id="codeInput" placeholder="Enter Launch Code">
@@ -648,6 +654,7 @@ function launchSystem(){
      const finalDiv = document.createElement("div");
      finalDiv.id = "finalReveal";
      finalDiv.textContent = line;
+	 finalDiv.setAttribute("data-text", line);
      terminalText.appendChild(finalDiv);
 
       document.querySelectorAll(".terminalLine").forEach(el=>{
@@ -701,13 +708,13 @@ function startTransition(){
     "Machine Learning Active"
   ];
 
-  for(let i=0;i<140;i++){
+  for(let i=0;i<70;i++){
 
     const eq = document.createElement("div");
     eq.classList.add("eq");
     eq.innerHTML = equations[Math.floor(Math.random()*equations.length)];
-    eq.style.left = Math.random()*100 + "%";
-    eq.style.fontSize = (16 + Math.random()*40) + "px";
+    eq.style.left = (5 + Math.random()*90) + "%";
+    eq.style.fontSize = (22 + Math.random()*26) + "px";
     eq.style.color = ["cyan","white","#7c3aed","#60a5fa"][Math.floor(Math.random()*4)];
     eq.style.animationDuration = (25 + Math.random()*20) + "s";
     eq.style.animationDelay = Math.random()*5 + "s";
@@ -1576,7 +1583,7 @@ setTimeout(()=>{
     {opacity:1, filter:"blur(5px)", transform:"scale(1.1)"},
     {opacity:0, filter:"blur(0px)", transform:"scale(1.18)"}
   ],{
-    duration:5200,
+    duration:12000,
     easing:"cubic-bezier(0.16,1,0.3,1)"
   });
 
@@ -1590,6 +1597,20 @@ setTimeout(()=>{
 
     playMusic(188,0.45);
     fadeMusicTo(1,4000);
+	
+	/* CUT MUSIC BEFORE FINAL 10 SECONDS */
+setTimeout(()=>{
+
+  fadeMusicTo(0,3000);
+
+  setTimeout(()=>{
+
+    const bgMusic = document.getElementById("bgMusic");
+    bgMusic.pause();
+
+  },3000);
+
+},35000);
 
     reveal.style.display = "flex";
     reveal.innerHTML = "";
@@ -1714,7 +1735,7 @@ const shipAnimation = ship.animate([
     }
 
   ],{
-    duration:5200,
+    duration:12000,
     easing:"cubic-bezier(0.16,1,0.3,1)",
 	fill:"forwards"
   });
